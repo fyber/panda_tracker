@@ -20,7 +20,7 @@ stat_args = {
 
 
 def validate(args):
-    if not args.get('date_from') and not args.get('last_n_days'):
+    if not args.get('date_from') and not args.get('last_n_days') is not None:
         raise ValidationError(
             'Either date_from or last_n_days fields are required.')
 
