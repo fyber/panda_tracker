@@ -27,6 +27,7 @@ def create_app(settings_override=None):
     register_blueprints(app, 'panda_tracker', root_package_path)
 
     app.errorhandler(ApplicationError)(application_error_handler)
+    app.errorhandler(422)(handle_422)
 
     return app
 
@@ -37,3 +38,17 @@ def application_error_handler(error):
         'error': error.error,
         'description': error.description,
     }), error.status_code
+
+
+def handle_422(err):
+    """This type of error is raised by webargs. Function copied from docs."""
+    # webargs attaches additional metadata to the `data` attribute
+    data = getattr(err, 'data')
+    if data:
+        # Get validations from the ValidationError object
+        messages = data['exc'].messages
+    else:
+        messages = ['Invalid request']
+    return jsonify({
+        'messages': messages,
+    }), 400

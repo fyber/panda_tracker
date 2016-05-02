@@ -3,6 +3,7 @@ from flask_jwt import jwt_required, current_identity
 from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
 from datetime import datetime, date, time, timedelta
+from marshmallow import ValidationError
 
 from bson import ObjectId
 
@@ -19,7 +20,9 @@ stat_args = {
 
 
 def validate(args):
-    return args.get('date_from', False) or args.get('last_n_days', False)
+    if not args.get('date_from') and not args.get('last_n_days'):
+        raise ValidationError(
+            'Either date_from or last_n_days fields are required.')
 
 
 @route(bp, '/')
