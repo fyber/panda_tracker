@@ -49,7 +49,7 @@ def route(bp, *args, **kwargs):
             if isinstance(rv, Response):
                 return rv
             elif force_json:
-                return jsonify(rv), sc
+                return jsonify(dict(data=rv)), sc
             else:
                 return rv, sc
 

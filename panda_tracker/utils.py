@@ -3,6 +3,8 @@ import pkgutil
 import importlib
 import logging
 from flask import Blueprint
+from flask.json import JSONEncoder as BaseJSONEncoder
+from bson import ObjectId
 
 
 def register_blueprints(app, package_name, package_path):
@@ -33,3 +35,13 @@ def configure_logging(app):
         app.config['LOGGING']['loggers']['']['handlers'].append('console')
 
     logging.config.dictConfig(app.config['LOGGING'])
+
+
+class JSONEncoder(BaseJSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, 'isoformat'):
+            return obj.isoformat()
+        elif isinstance(obj, ObjectId):
+            return str(obj)
+
+        return super(JSONEncoder, self).default(obj)

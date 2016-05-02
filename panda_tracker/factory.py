@@ -5,7 +5,7 @@ import logging.config
 from flask import Flask, jsonify
 
 from .core import mongo, jwt, ApplicationError
-from .utils import register_blueprints
+from .utils import register_blueprints, JSONEncoder
 
 
 def create_app(settings_override=None):
@@ -18,7 +18,7 @@ def create_app(settings_override=None):
     logging.config.dictConfig(app.config['LOGGING'])
 
     # Set the default JSON encoder
-    # app.json_encoder = JSONEncoder
+    app.json_encoder = JSONEncoder
 
     mongo.init_app(app)
     jwt.init_app(app)

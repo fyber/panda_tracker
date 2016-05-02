@@ -1,8 +1,8 @@
-from webargs import fields, missing
-from datetime import datetime, date, time, timedelta
-from flask import Blueprint, request
+from flask import Blueprint
 from flask_jwt import jwt_required, current_identity
+from webargs import fields, missing
 from webargs.flaskparser import use_kwargs
+from datetime import datetime, date, time, timedelta
 
 from bson import ObjectId
 
@@ -19,8 +19,7 @@ stat_args = {
 
 
 def validate(args):
-    return (args.get('date_from') is not missing or
-            args.get('last_n_days') is not missing)
+    return args.get('date_from', False) or args.get('last_n_days', False)
 
 
 @route(bp, '/')
@@ -43,11 +42,6 @@ def get_stats(date_from, date_to, last_n_days):
     date_from = datetime.combine(date_from, time.min)
     date_to = datetime.combine(date_to, time.min)
 
-    print({
-            'metadata.userid': ObjectId(str(current_identity)),
-            'metadata.date': {'$gte': date_from, '$lte': date_to},
-        })
-
     stats = mongo.db.event_data.find(
         {
             'metadata.userid': ObjectId(str(current_identity)),
@@ -58,6 +52,4 @@ def get_stats(date_from, date_to, last_n_days):
         sort=[('metadata.date', 1)]
     )
 
-    rv = list(stats)
-    # print(rv)
-    return rv
+    return list(stats)
